@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  php:
+    tty: true
+    image: php:8.2-apache
+    container_name: php_axopen_recrutement
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    volumes:
+      - ./:/app
+    ports:
+      - "8000:8000"
+
+  db:
+    image: 'mariadb:10.10.2'
+    container_name: db_axopen_recrutement
+    restart: always
+    environment:
+      - "MYSQL_USER=axopen"
+      - "MYSQL_PASSWORD=axopen"
+      - "MYSQL_DATABASE=axopen_recrutement"
+      - "MYSQL_ROOT_PASSWORD=axopen"
+    ports:
+      - '3306:3306'
+    volumes:
+      - ./docker/mariadb/:/var/lib/mysql/

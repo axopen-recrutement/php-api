@@ -1,0 +1,40 @@
+include:
+  - project: 'open/axodevsecops'
+    ref: 1.10.0
+    file: '/sonar/php.yml'
+  - project: 'open/axodevsecops'
+    ref: 1.10.0
+    file: '/dependency-track/php.yml'
+
+stages:
+  - sonar
+  - secops
+
+
+variables:
+  # Variable permettant de savoir quelle image composer à récupérer
+  COMPOSER_VERSION: "2.2"
+  # API_KEY pour contacter l'api de dependency track
+  DEPTRACK_API_KEY: "EwRzZ5AclFnPGaIKixyzSKlfEPTPnNJd"
+
+sonar:
+  stage: sonar
+  extends: .sonar-php
+
+
+# Job qui va permettre de générer le fichier listant les dépendances.
+dependency-track:
+  extends: .dependency-track
+  stage: secops
+  needs: []
+  dependencies: []
+
+# Job qui se charge d'envoyer le fichier au server de Dependency-Track
+dependency-track-publish:
+  extends: .dependency-track-publish
+  stage: secops
+  needs:
+    - job: dependency-track
+      artifacts: true
+  dependencies:
+    - dependency-track
